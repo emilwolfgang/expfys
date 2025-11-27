@@ -1,0 +1,5 @@
+# Sample configuration for Del B (free collision) analysis
+bodies_path: data/del_b/bodies/bodiesB1.tsv
+dist_threshold: 63.5
+max_gap_frames: 3
+make_plots: false

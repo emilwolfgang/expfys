@@ -1,0 +1,7 @@
+prefix	marker_name	weight_kg	dist_threshold
+A1	New 0000	0.1813	32.5
+A1	New 0001	0.1827	32.5
+A2	New 0000	0.1817	55
+A2	New 0001	0.1831	55
+A3	New 0000	0.1813	233.7
+A3	New 0001	0.1827	233.7

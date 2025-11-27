@@ -1,0 +1,5 @@
+# Sample configuration for Del B (sticky collision) analysis
+bodies_path: data/del_b/bodies/bodiesB2.tsv
+dist_threshold: 60.0
+max_gap_frames: 3
+make_plots: false

@@ -1,0 +1,9 @@
+# Sample configuration for Del A analysis
+m1: 0.2
+m2: 0.2
+dist_threshold: 30.0
+max_gap_frames: 3
+marker1: marker_1
+marker2: marker_2
+save_vel: true
+make_plots: false
