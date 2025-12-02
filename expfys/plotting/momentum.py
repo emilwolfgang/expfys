@@ -11,6 +11,7 @@ from matplotlib.lines import Line2D
 
 from ..materials import MaterialSeries, get_series
 from ..summary_io import SummaryTable, infer_attempt_numbers, load_tables
+from .style import set_fixed_figwidth
 
 
 def _load_tables(part: str, overrides: Sequence[MaterialSeries] | None) -> list[SummaryTable]:
@@ -27,6 +28,7 @@ def plot_relative_momentum_part_a(
     created_fig = None
     if ax is None:
         created_fig, ax = plt.subplots()
+        set_fixed_figwidth(created_fig)
 
     for table in tables:
         frame = table.frame.copy()
@@ -75,6 +77,7 @@ def plot_relative_momentum_part_b(
     created_fig = None
     if ax is None:
         created_fig, ax = plt.subplots()
+        set_fixed_figwidth(created_fig)
 
     relx_all = []
     rely_all = []

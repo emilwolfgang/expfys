@@ -49,6 +49,7 @@ import numpy as np
 import pandas as pd
 
 from expfys.dataio import load_qtm_6d_file_version
+from expfys.plotting.style import set_fixed_figwidth
 
 
 # =============================================================================
@@ -378,6 +379,7 @@ def plot_plane_scatter_with_orientation(
     """Rita 2D-bana (x, y) för varje puck + linjer som visar orienteringen i x–y-planet."""
     b1, b2 = bodies_order
     fig, ax = plt.subplots(figsize=(8, 8))
+    set_fixed_figwidth(fig)
 
     colors = {b1: "C0", b2: "C1"}
 
@@ -440,9 +442,11 @@ def plot_theta_with_fits(
     """
     b1, b2 = bodies_order
     bodies = [b1, b2]
-    colors = {b1: "C0", b2: "C1"}
+    pos_colors = {b1: "C0", b2: "C1"}
+    vel_colors = {b1: "#1f77b4", b2: "#ff7f0e"}
 
     fig, ax = plt.subplots(figsize=(10, 5))
+    set_fixed_figwidth(fig)
 
     for body in bodies:
         theta_rad = orient[body]["theta"]
@@ -557,6 +561,7 @@ def plot_u_v_e(
     """
     b1, b2 = bodies_order
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    set_fixed_figwidth(fig)
     bodies = [b1, b2]
     colors = {b1: "C0", b2: "C1"}
 
@@ -644,8 +649,10 @@ def plot_velocity_components(
     """
     b1, b2 = bodies_order
     bodies = [b1, b2]
-    colors = {b1: "C0", b2: "C1"}
+    pos_colors = {b1: "C0", b2: "C1"}
+    vel_colors = {b1: "#1f77b4", b2: "#ff7f0e"}
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    set_fixed_figwidth(fig)
 
     comp_labels = ["v_x", "v_y", "v_z"]
     # Används för att bara sätta legend-label för t_- / t_+ en gång
@@ -755,10 +762,7 @@ def plot_u_and_vu(
     t_window_minus: float | None = None,
     t_window_plus: float | None = None,
 ):
-    """Plotta u-position (≈ x) och v_u (v_x) i två subplots för båda puckarna.
-
-    Vertikala linjer markerar t_P-/t_P+, t_min (dist) samt fönsterkanter t_- och t_+.
-    """
+    """Plotta u-position (≈ x) och v_u (v_x) i samma figur med två y-axlar."""
     # Enlarge text sizes for this specific plot
     plt.rcParams.update({
         "font.size": 16,
@@ -770,9 +774,12 @@ def plot_u_and_vu(
     })
     b1, b2 = bodies_order
     bodies = [b1, b2]
-    colors = {b1: "C0", b2: "C1"}
+    pos_colors = {b1: "C0", b2: "C1"}
+    vel_colors = {b1: "#1f77b4", b2: "#ff7f0e"}
 
-    fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+    fig, ax_pos = plt.subplots(figsize=(10, 6))
+    set_fixed_figwidth(fig)
+    ax_vel = ax_pos.twinx()
 
     # Beräkna u-komponenten relativt origin och v_u = v_x
     u_coords: Dict[str, np.ndarray] = {}
@@ -782,48 +789,44 @@ def plot_u_and_vu(
         u_coords[body] = r[:, 0]
         v_u_coords[body] = velocities[body][:, 0]  # v_x-komponenten
 
-    # Subplot 0: u(t)
-    ax_u = axes[0]
+    # Skugga först tröskelområdet (t_- till t_+) om det finns
+    span_handles: list[tuple] = []
+    if (
+        t_window_minus is not None
+        and t_window_plus is not None
+        and t_window_plus > t_window_minus
+    ):
+        patch = ax_pos.axvspan(
+            t_window_minus,
+            t_window_plus,
+            color="orange",
+            alpha=0.12,
+            label="Tröskelavstånd",
+        )
+        span_handles.append((patch, "Tröskelavstånd"))
+    # Skugga kollisionsfönstret (t_P- till t_P+) om vi har det
+    if (
+        t_p_minus is not None
+        and t_p_plus is not None
+        and t_p_plus > t_p_minus
+    ):
+        patch = ax_pos.axvspan(
+            t_p_minus,
+            t_p_plus,
+            color="red",
+            alpha=0.08,
+            label="Kollisionsfönster",
+        )
+        span_handles.append((patch, "Kollisionsfönster"))
+
+    # Vänster y-axel: position
     for body in bodies:
-        c = colors[body]
-        label = r"Puck 1" if body == bodies[0] else r"Puck 2"
-        ax_u.plot(time, u_coords[body], label=label, color=c, alpha=0.9)
-
-        # Rita fittade polynom för u-komponenten (x) om vi har pos_fits
-        if pos_fits is not None:
-            body_fit = pos_fits.get(body, {})
-            fit_u = body_fit.get(0)  # komponent 0 = x/u
-            if fit_u is not None:
-                pre_t = fit_u["pre_t"]
-                post_t = fit_u["post_t"]
-                pre_fit = fit_u["pre_fit"]
-                post_fit = fit_u["post_fit"]
-
-                # Justera till samma referens som u_coords (relativt origin)
-                pre_fit_rel = pre_fit - origin[0]
-                post_fit_rel = post_fit - origin[0]
-
-                ax_u.plot(
-                    pre_t,
-                    pre_fit_rel,
-                    linestyle=":",
-                    color=c,
-                    alpha=0.9,
-                    label=r"$q_{1 innan}$" if body == bodies[0] else r"$q_{2 innan}$",
-                    linewidth=2.5,
-                )
-                ax_u.plot(
-                    post_t,
-                    post_fit_rel,
-                    linestyle="--",
-                    color=c,
-                    alpha=0.9,
-                    label=r"$q_{1 efter}$" if body == bodies[0] else r"$q_{2 efter}$",
-                    linewidth=2.5,
-                )
-    # Vertikala linjer (endast label i första subploten)
+        c = pos_colors[body]
+        label = r"Position puck 1" if body == bodies[0] else r"Position puck 2"
+        ax_pos.plot(time, u_coords[body], label=label, color=c, linewidth=2.0)
+    # Vertikala linjer (etikett endast en gång)
     if t_p_minus is not None:
-        ax_u.axvline(
+        ax_pos.axvline(
             t_p_minus,
             linestyle="--",
             color="black",
@@ -831,43 +834,36 @@ def plot_u_and_vu(
             label=r"$t_{P-}$",
         )
     if t_p_plus is not None:
-        ax_u.axvline(
+        ax_pos.axvline(
             t_p_plus,
             linestyle="--",
             color="black",
             alpha=0.7,
             label=r"$t_{P+}$",
         )
-    if t_window_minus is not None:
-        ax_u.axvline(
-            t_window_minus,
-            linestyle="-",
-            color="orange",
-            alpha=0.5,
-            label=r"$t_{-}$",
+    if t_p_star is not None:
+        ax_pos.axvline(
+            t_p_star,
+            linestyle="-.",
+            color="red",
+            alpha=0.8,
+            label=r"$t_{\min}$ (dist)",
         )
-    if t_window_plus is not None:
-        ax_u.axvline(
-            t_window_plus,
-            linestyle="-",
-            color="orange",
-            alpha=0.5,
-            label=r"$t_{+}$",
-        )
-    ax_u.set_ylabel(r"Position $ \hat{u}\;[\mathrm{mm}]$")
-    ax_u.grid(True)
-    ax_u.legend(loc="best")
+    ax_pos.set_ylabel(r"Position $ \hat{u}\;[\mathrm{mm}]$", color="#1f4e79")
+    ax_pos.tick_params(axis="y", colors="#1f4e79")
+    ax_pos.set_ylim(-50, -30)
+    ax_pos.grid(True)
 
-    # Subplot 1: v_u(t) = v_x(t)
-    ax_v = axes[1]
+    # Höger y-axel: hastighet
     for body in bodies:
-        c = colors[body]
-        ax_v.plot(
+        c = vel_colors[body]
+        ax_vel.plot(
             time,
             v_u_coords[body],
-            label=r"$v_{1}$" if body == bodies[0] else r"$v_{2}$",
+            label=r"Hastighet puck 1" if body == bodies[0] else r"Hastighet puck 2",
             color=c,
             alpha=0.9,
+            linestyle="--",
         )
 
         # Markera v_pre och v_post för x-komponenten om de finns
@@ -876,12 +872,8 @@ def plot_u_and_vu(
                 v_pre_body = v_pre.get(body)
                 if v_pre_body is not None:
                     y_pre_point = v_pre_body[0]  # x-komponenten
-                    label_pre = (
-                        r"$v_{1}$"
-                        if body == bodies[0]
-                        else r"$v_{2}$"
-                    )
-                    ax_v.scatter(
+                    label_pre = r"$v_{1}$" if body == bodies[0] else r"$v_{2}$"
+                    ax_vel.scatter(
                         t_p_minus,
                         y_pre_point,
                         color=c,
@@ -893,12 +885,8 @@ def plot_u_and_vu(
                 v_post_body = v_post.get(body)
                 if v_post_body is not None:
                     y_post_point = v_post_body[0]
-                    label_post = (
-                        r"$v_{1}'$"
-                        if body == bodies[0]
-                        else r"$v_{2}'$"
-                    )
-                    ax_v.scatter(
+                    label_post = r"$v_{1}'$" if body == bodies[0] else r"$v_{2}'$"
+                    ax_vel.scatter(
                         t_p_plus,
                         y_post_point,
                         color=c,
@@ -907,32 +895,36 @@ def plot_u_and_vu(
                         zorder=5,
                         label=label_post,
                     )
-    # Vertikala linjer utan extra labels (dessa finns redan i första subploten)
-    if t_p_minus is not None:
-        ax_v.axvline(t_p_minus, linestyle="--", color="k", alpha=0.7)
-    if t_p_plus is not None:
-        ax_v.axvline(t_p_plus, linestyle="--", color="grey", alpha=0.7)
-    if t_window_minus is not None:
-        ax_v.axvline(
-            t_window_minus,
-            linestyle="-",
-            color="orange",
-            alpha=0.5,
-        )
-    if t_window_plus is not None:
-        ax_v.axvline(
-            t_window_plus,
-            linestyle="-",
-            color="orange",
-            alpha=0.5,
-        )
-    ax_v.set_ylabel(r"$v_{\hat{u}}\;[\mathrm{mm/s}]$")
-    ax_v.set_xlabel("Tid (s)")
-    ax_v.grid(True)
-    ax_v.legend(loc="best")
+    ax_vel.set_ylabel(r"$v_{\hat{u}}\;[\mathrm{mm/s}]$", color="#cc5500")
+    ax_vel.tick_params(axis="y", colors="#cc5500")
+
+    ax_pos.set_ylabel(r"Position $ \hat{u}\;[\mathrm{mm}]$", color="#1f4e79")
+    ax_pos.tick_params(axis="y", colors="#1f4e79")
+    ax_pos.set_xlabel("Tid (s)")
 
     if title:
         fig.suptitle(title)
+    handles_pos, labels_pos = ax_pos.get_legend_handles_labels()
+    handles_vel, labels_vel = ax_vel.get_legend_handles_labels()
+
+    def _dedup(handles, labels):
+        seen: set[str] = set()
+        out_h: list = []
+        out_l: list[str] = []
+        for handle, label in zip(handles, labels):
+            if not label or label in seen:
+                continue
+            seen.add(label)
+            out_h.append(handle)
+            out_l.append(label)
+        return out_h, out_l
+
+    pos_handles, pos_labels = _dedup(handles_pos, labels_pos)
+    vel_handles, vel_labels = _dedup(handles_vel, labels_vel)
+    if pos_handles:
+        ax_pos.legend(pos_handles, pos_labels, loc="upper left")
+    if vel_handles:
+        ax_vel.legend(vel_handles, vel_labels, loc="upper right")
     plt.tight_layout()
 
 

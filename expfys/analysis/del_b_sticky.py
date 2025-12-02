@@ -49,6 +49,7 @@ import numpy as np
 import pandas as pd
 
 from expfys.dataio import load_qtm_6d_file_version
+from expfys.plotting.style import set_fixed_figwidth
 
 
 # =============================================================================
@@ -465,6 +466,7 @@ def plot_plane_scatter_with_orientation(
     """Rita 2D-bana (x, y) för varje puck + linjer som visar orienteringen i x–y-planet."""
     b1, b2 = bodies_order
     fig, ax = plt.subplots(figsize=(8, 8))
+    set_fixed_figwidth(fig)
 
     colors = {b1: "C0", b2: "C1"}
 
@@ -534,6 +536,7 @@ def plot_theta_with_fits(
     colors = {body: color_cycle[i % len(color_cycle)] for i, body in enumerate(bodies)}
 
     fig, ax = plt.subplots(figsize=(10, 5))
+    set_fixed_figwidth(fig)
 
     for body in bodies:
         theta_rad = orient[body]["theta"]
@@ -655,6 +658,7 @@ def plot_position_components(
     color_cycle = ["C0", "C1", "C2", "C3", "C4", "C5"]
     colors = {body: color_cycle[i % len(color_cycle)] for i, body in enumerate(bodies)}
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    set_fixed_figwidth(fig)
 
     comp_labels = ["x", "y", "z"]
     window_labels_done = False
@@ -743,6 +747,7 @@ def plot_velocity_components(
     color_cycle = ["C0", "C1", "C2", "C3", "C4", "C5"]
     colors = {body: color_cycle[i % len(color_cycle)] for i, body in enumerate(bodies)}
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    set_fixed_figwidth(fig)
 
     comp_labels = ["v_x", "v_y", "v_z"]
     # Används för att bara sätta legend-label för t_- / t_+ en gång

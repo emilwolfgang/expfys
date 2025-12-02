@@ -31,6 +31,7 @@ from expfys.dataio import (
     find_markers_xyz_flexible,
     load_qmt_any,
 )
+from expfys.plotting.style import set_fixed_figwidth
 
 
 # =============================================================================
@@ -475,6 +476,7 @@ def plot_positions_xyz_with_fits(
     t = time.astype(float).to_numpy()
 
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 8))
+    set_fixed_figwidth(fig)
     ax_x, ax_y, ax_z = axes
 
     components = [("X", ax_x, "x-position (m)"), ("Y", ax_y, "y-position (m)"), ("Z", ax_z, "z-position (m)")]
@@ -617,6 +619,7 @@ def plot_1d_projection_with_fits(
         e_hat = d_vec / d_norm
 
     fig, ax = plt.subplots(figsize=(10, 4))
+    set_fixed_figwidth(fig)
 
     colors = ["C0", "C1"]
     for j, base in enumerate(marker_pair):

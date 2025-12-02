@@ -11,6 +11,7 @@ from matplotlib.lines import Line2D
 
 from ..materials import MATERIAL_COLOR_MAP, MaterialSeries, get_series
 from ..summary_io import SummaryTable, load_tables
+from .style import set_fixed_figwidth
 
 
 def _load_tables(part: str, overrides: Sequence[MaterialSeries] | None) -> list[SummaryTable]:
@@ -27,6 +28,7 @@ def plot_angular_momentum_part_b(
     created_fig = None
     if ax is None:
         created_fig, ax = plt.subplots()
+        set_fixed_figwidth(created_fig)
 
     all_rel = []
     last_x = None
@@ -102,6 +104,7 @@ def plot_energy_comparison(
     created_fig = None
     if ax is None:
         created_fig, ax = plt.subplots()
+        set_fixed_figwidth(created_fig)
 
     offsets = {"A": -0.12, "B": +0.12}
     group_map = {
@@ -161,7 +164,7 @@ def plot_energy_comparison(
         "Skumgummi (B)",
     ]
     ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels, rotation=30, ha="right")
+    ax.set_xticklabels(tick_labels, rotation=15, ha="right")
 
     ax.set_xlabel("Mätserie")
     ax.set_ylabel(r"$Q_E$ [$\%$]")

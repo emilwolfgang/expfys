@@ -36,7 +36,18 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+REPORT_RC_PARAMS = {
+    "axes.titlesize": 18,
+    "axes.labelsize": 16,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+    "legend.fontsize": 16,
+    "figure.titlesize": 20,
+}
+plt.rcParams.update(REPORT_RC_PARAMS)
+
 from expfys.analysis.del_a import load_qmt_any, find_markers_xyz_flexible
+from expfys.plotting.style import FIG_WIDTH_IN, set_fixed_figwidth
 
 
 def detect_time_series(df: pd.DataFrame) -> pd.Series:
@@ -65,7 +76,8 @@ def find_collision_time(df: pd.DataFrame) -> float:
 
 
 def plot_z_centered(files: list[str], marker="New 0000", energy_map: dict[str, float] | None = None):
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, 3))
+    set_fixed_figwidth(fig)
     any_plotted = False
 
     cmap = plt.get_cmap("RdYlGn")  # green (high) to red (low)
@@ -159,7 +171,7 @@ def plot_z_centered(files: list[str], marker="New 0000", energy_map: dict[str, f
 
     ax.axvline(0, color="black", linestyle="--", linewidth=1)
     ax.set_xlabel("Tid relativt kollision [s]", fontsize=14)
-    ax.set_ylabel("Vertikal position för markör 1 [mm]", fontsize=14)
+    ax.set_ylabel("Vertikal position\nmarkör 1 [mm]", fontsize=14, labelpad=20)
     ax.set_title("Vertikal position kring kollisionstidpunkten för kontaktytan aluminium, del A", fontsize=16)
     ax.tick_params(axis="both", labelsize=12)
     ax.legend(fontsize=10)

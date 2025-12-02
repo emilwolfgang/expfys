@@ -17,6 +17,7 @@ from expfys.plotting import (
     plot_relative_momentum_part_a,
     plot_relative_momentum_part_b,
 )
+from expfys.plotting.style import FIG_WIDTH_IN, set_fixed_figwidth
 
 plt.rcParams.update(
     {
@@ -24,7 +25,7 @@ plt.rcParams.update(
         "axes.labelsize": 16,
         "xtick.labelsize": 14,
         "ytick.labelsize": 14,
-        "legend.fontsize": 15,
+        "legend.fontsize": 16,
         "figure.titlesize": 20,
     }
 )
@@ -32,20 +33,23 @@ plt.rcParams.update(
 
 def main() -> None:
     """Generate the exact figures used in the report."""
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH_IN, 4))
+    set_fixed_figwidth(fig)
     plot_relative_momentum_part_a(axes[0])
     axes[0].set_title("Del A - Endimensionell rörelse")
     plot_relative_momentum_part_b(axes[1])
     axes[1].set_title("Del B - Tvådimensionell rörelse")
-    fig.suptitle("Föräning av rörelsemängd i rörelsens riktning", fontsize=22)
+    fig.suptitle("Förändring av rörelsemängd i rörelsens riktning", fontsize=20)
     fig.tight_layout()
     plt.show()
 
     fig, ax = plt.subplots()
+    set_fixed_figwidth(fig)
     plot_angular_momentum_part_b(ax)
     plt.show()
 
     fig, ax = plt.subplots()
+    set_fixed_figwidth(fig)
     plot_energy_comparison(ax)
     plt.show()
 
