@@ -5,13 +5,12 @@ from __future__ import annotations
 from typing import Iterable, Sequence
 
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import numpy as np
 from matplotlib.lines import Line2D
 
 from ..materials import MaterialSeries, get_series
 from ..summary_io import SummaryTable, infer_attempt_numbers, load_tables
-from .style import set_fixed_figwidth
+from .style import percent_formatter, set_fixed_figwidth
 
 
 def _load_tables(part: str, overrides: Sequence[MaterialSeries] | None) -> list[SummaryTable]:
@@ -52,7 +51,7 @@ def plot_relative_momentum_part_a(
 
     ax.set_xlabel(r"Försök nummer")
     ax.set_ylabel(r"$Q_{p_{\hat{n}}}$ [%]")
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_major_formatter(percent_formatter())
     ax.grid(True, linestyle=":", linewidth=0.5)
 
     kontakt_handle = Line2D([], [], linestyle="None", marker="None", label="Kontaktyta:")
@@ -118,8 +117,8 @@ def plot_relative_momentum_part_b(
     ax.set_ylabel(r"$Q_{p_{\hat{v}}}$ [%]")
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, linestyle=":", linewidth=0.5)
-    ax.xaxis.set_major_formatter(mtick.PercentFormatter())
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.xaxis.set_major_formatter(percent_formatter())
+    ax.yaxis.set_major_formatter(percent_formatter())
 
     kontakt_handle = Line2D([], [], linestyle="None", marker="None", label="Kontaktyta:")
     mean_handle = Line2D([], [], marker="o", markersize=8, markerfacecolor="none", markeredgecolor="black", linestyle="None", label="Medelvärde")

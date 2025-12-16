@@ -81,6 +81,8 @@ def plot_z_centered(files: list[str], marker="New 0000", energy_map: dict[str, f
     any_plotted = False
 
     cmap = plt.get_cmap("RdYlGn")  # green (high) to red (low)
+    color_clip_low = 0.4
+    color_green_start = 0.5
     vmin = vmax = None
     if energy_map:
         vals = list(energy_map.values())
@@ -134,17 +136,13 @@ def plot_z_centered(files: list[str], marker="New 0000", energy_map: dict[str, f
 
             # --- Justerad färgskala ---
             # Klipp alla värden under 0.4 → samma mörkröda nyans
-            val_adj = max(val, 0.4)
+            val_adj = max(val, color_clip_low)
 
-            # Övre gräns – tryck ihop toppområdet så att grönt blir lättare att nå
-            val_adj = min(val_adj, 0.85)
+            # Övre gräns – tryck ihop toppområdet så att grönt börjar runt 0.5
+            val_adj = min(val_adj, color_green_start)
 
-            # Effektivt intervall
-            vmin_eff = 0.4
-            vmax_eff = 0.85
-
-            # Normalisera
-            norm = (val_adj - vmin_eff) / (vmax_eff - vmin_eff)
+            # Normalisera inom det effektiva intervallet
+            norm = (val_adj - color_clip_low) / (color_green_start - color_clip_low)
             norm = max(0.0, min(1.0, norm))
 
             color = cmap(norm)
@@ -163,7 +161,10 @@ def plot_z_centered(files: list[str], marker="New 0000", energy_map: dict[str, f
 
     # färgskalans färgbar om vi har energidata
     if energy_map and vmin is not None and vmax is not None:
-        sm = cm.ScalarMappable(norm=mcolors.Normalize(vmin=vmin, vmax=vmax), cmap=cmap)
+        sm = cm.ScalarMappable(
+            norm=mcolors.Normalize(vmin=color_clip_low, vmax=color_green_start),
+            cmap=cmap,
+        )
         sm.set_array([])
         cbar = fig.colorbar(sm, ax=ax)
         cbar.set_label(r"$Q_E$", fontsize=14)
