@@ -5,13 +5,12 @@ from __future__ import annotations
 from typing import Sequence
 
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import numpy as np
 from matplotlib.lines import Line2D
 
 from ..materials import MATERIAL_COLOR_MAP, MaterialSeries, get_series
 from ..summary_io import SummaryTable, load_tables
-from .style import set_fixed_figwidth
+from .style import percent_formatter, set_fixed_figwidth
 
 
 def _load_tables(part: str, overrides: Sequence[MaterialSeries] | None) -> list[SummaryTable]:
@@ -77,7 +76,7 @@ def plot_angular_momentum_part_b(
 
     ax.set_ylabel(r"Relativ förändring i rörelsemängdsmoment [$\%$]")
     ax.set_title(r"Bevarande av rörelsemängdsmoment i Del B ($\hat{n}$-riktning)")
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_major_formatter(percent_formatter())
     ax.grid(True, linestyle=":", linewidth=0.5)
 
     kontakt_handle = Line2D([], [], linestyle="None", marker="None", label="Kontaktyta:")
@@ -169,7 +168,7 @@ def plot_energy_comparison(
     ax.set_xlabel("Mätserie")
     ax.set_ylabel(r"$Q_E$ [$\%$]")
     ax.set_title("Relativ förändring i kinetisk energi i Del A och Del B")
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_major_formatter(percent_formatter())
     ax.grid(True, linestyle=":", linewidth=0.5)
 
     point_handle = Line2D([], [], marker="o", markersize=8, markerfacecolor="none", markeredgecolor="black", linestyle="None", label="Mätvärde")
